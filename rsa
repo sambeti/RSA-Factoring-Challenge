@@ -1,44 +1,51 @@
 #!/usr/bin/python3
-
 import sys
+import random
 import time
 
-def factorize(num):
-    '''Takes a number as input.
-    
-    Args:
-    num: input integer.
-    Return: A tuple of two factors if the number is not a prime.
-    None if the number is prime.
-    '''
-    for i in range(2, int(num**0.5) + 1):
-        if num % i == 0:
-            return (i, num // i)
-    return None
+def is_prime(num, k=20):
+    if num == 2 or num == 3:
+        return True
+    if num < 2 or num % 2 == 0:
+        return False
+
+    d = num - 1
+    r = 0
+    while d % 2 == 0:
+        d //= 2
+        r += 1
+
+    for _ in range(k):
+        a = random.randint(2, num - 2)
+        x = pow(a, d, num)
+        if x == 1 or x == num - 1:
+            x = pow(x, 2, num)
+        if x == num - 1:
+            continue
+        return False
+    return True
 
 if __name__ == "__main__":
-    '''Reads the input file.
-    '''
     if len(sys.argv) != 2:
-        print("Usage: factors <file>")
+        print("Usage: rsa <file>")
         sys.exit()
-    
+
     input_file = sys.argv[1]
-    
+
     try:
         with open(input_file, 'r') as f:
-            lines = f.readlines()
+            lines = f.readline()
     except FileNotFoundError:
         print("File not found")
         sys.exit()
-    
-    start_time = time.time()
-    for line in lines:
-        num = int(line.strip())
-        factors = factorize(num)
-        if factors:
-            print(f"{num} = {factors[0]} * {factors[1]}")
-        if time.time() - start_time > 5:
-            print("Time limit exceeded")
-            sys.exit()
 
+    start_time = time.time()
+    num = int(lines[0].strip())
+    for i in range(2, num // 2):
+        if num % i == 0 and is_prime(i) and is_prime(num // i):
+            print(f"{num} = {i} * {num // i}")
+            break
+
+    if time.time() - start_time > 5:
+        print("Time limit exceeded")
+        sys.exit()
